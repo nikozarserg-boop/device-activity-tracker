@@ -32,11 +32,13 @@ const io = new Server(httpServer, {
 });
 
 let sock: any;
-let isWhatsAppConnected = false;
-let isSignalConnected = false;
-let signalAccountNumber: string | null = null;
-let globalProbeMethod: ProbeMethod = 'delete'; // Default to delete method
-let currentWhatsAppQr: string | null = null; // Store current QR code for new clients
+ let isWhatsAppConnected = false;
+ let isSignalConnected = false;
+ let signalAccountNumber: string | null = null;
+ let globalProbeMethod: ProbeMethod = 'delete'; // Default to delete method
+ let currentWhatsAppQr: string | null = null; // Store current QR code for new clients
+ let globalProbeMinDelay: number = 500; // Min delay in ms
+ let globalProbeMaxDelay: number = 1000; // Max delay in ms
 
 // Platform type for contacts
 type Platform = 'whatsapp' | 'signal';
@@ -391,13 +393,31 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('pause-tracking', (jid: string) => {
+        console.log(`Request to pause tracking: ${jid}`);
+        const entry = trackers.get(jid);
+        if (entry) {
+            entry.tracker.stopTracking();
+            io.emit('tracking-paused', jid);
+        }
+    });
+
+    socket.on('resume-tracking', (jid: string) => {
+        console.log(`Request to resume tracking: ${jid}`);
+        const entry = trackers.get(jid);
+        if (entry) {
+            entry.tracker.startTracking();
+            io.emit('tracking-resumed', jid);
+        }
+    });
+
     socket.on('remove-contact', (jid: string) => {
-        console.log(`Request to stop tracking: ${jid}`);
+        console.log(`Request to remove contact: ${jid}`);
         const entry = trackers.get(jid);
         if (entry) {
             entry.tracker.stopTracking();
             trackers.delete(jid);
-            socket.emit('contact-removed', jid);
+            io.emit('contact-removed', jid);
         }
     });
 
@@ -420,6 +440,35 @@ io.on('connection', (socket) => {
 
         io.emit('probe-method', method);
         console.log(`Probe method changed to: ${method}`);
+    });
+
+    socket.on('set-probe-delay', (data: { minDelay: number; maxDelay: number }) => {
+        const timestamp = new Date().toLocaleTimeString();
+        console.log(`\n[${timestamp}] Probe delay change requested`);
+        console.log(`   Min: ${data.minDelay}ms, Max: ${data.maxDelay}ms`);
+        
+        if (data.minDelay < 10 || data.maxDelay > 5000 || data.minDelay >= data.maxDelay) {
+            console.log(`   REJECTED - Invalid values (Min must be >= 10, Max must be <= 5000, Min < Max)`);
+            socket.emit('error', { message: 'Invalid delay values' });
+            return;
+        }
+
+        globalProbeMinDelay = data.minDelay;
+        globalProbeMaxDelay = data.maxDelay;
+
+        let updatedTrackers = 0;
+        for (const entry of trackers.values()) {
+            if (entry.platform === 'whatsapp') {
+                (entry.tracker as WhatsAppTracker).setProbeDelay(data.minDelay, data.maxDelay);
+            } else {
+                (entry.tracker as SignalTracker).setProbeDelay(data.minDelay, data.maxDelay);
+            }
+            updatedTrackers++;
+        }
+
+        io.emit('probe-delay-updated', { minDelay: data.minDelay, maxDelay: data.maxDelay });
+        console.log(`   ACCEPTED - Updated ${updatedTrackers} active tracker(s)`);
+        console.log(`   Range: ${data.minDelay}-${data.maxDelay}ms (~${Math.round(1000 / ((data.minDelay + data.maxDelay) / 2))} probes/sec)\n`);
     });
 });
 
