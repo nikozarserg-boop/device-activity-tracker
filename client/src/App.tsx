@@ -195,7 +195,7 @@ function App() {
 
                         {/* Language Switcher */}
                          <div 
-                             className={`relative inline-flex items-center rounded-full p-1 w-fit border-2 transition-all duration-300 ${
+                             className={`relative inline-flex items-center rounded-full p-1 w-fit border-2 ${
                                  theme === 'dark'
                                      ? 'bg-gray-900 border-gray-700'
                                      : 'bg-gray-50 border-blue-200'
@@ -204,42 +204,36 @@ function App() {
                                  boxShadow: language === 'en' 
                                      ? `0 0 20px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.1)`
                                      : `0 0 20px rgba(79, 70, 229, 0.3), inset 0 0 20px rgba(79, 70, 229, 0.1)`,
-                                 transition: 'box-shadow 500ms ease-out'
+                                 transition: 'box-shadow 500ms cubic-bezier(0.4, 0, 0.2, 1)'
                              }}
                          >
                              {/* Animated Background Slider */}
                              <div 
-                                 className={`absolute top-1 bottom-1 w-16 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 rounded-full transition-all duration-500 ease-out ${
+                                 className={`absolute top-1 bottom-1 w-16 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 rounded-full ${
                                      language === 'en' ? 'left-1' : 'left-16'
                                  }`}
                                  style={{
                                      boxShadow: language === 'en' 
                                          ? '0 8px 25px rgba(59, 130, 246, 0.5)' 
                                          : '0 8px 25px rgba(79, 70, 229, 0.5)',
-                                     transition: 'all 500ms ease-out'
+                                     transition: 'all 500ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 500ms cubic-bezier(0.4, 0, 0.2, 1)'
                                  }}
                              />
                              
                              <button
                                  onClick={() => handleLanguageChange('en')}
-                                 className={`relative px-4 py-2 text-sm font-bold rounded-full flex items-center justify-center gap-1.5 transition-all duration-500 z-10 w-16 ${
+                                 className={`relative px-4 py-2 text-sm font-bold rounded-full flex items-center justify-center transition-all duration-500 z-10 w-16 ${
                                      language === 'en'
                                          ? 'text-white'
                                          : `${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`
                                  }`}
                                  title="English"
                              >
-                                 <Globe 
-                                     size={15} 
-                                     className={`transition-all duration-500 flex-shrink-0 ${
-                                         langButtonAnimating && language === 'en' ? 'animate-spin scale-110' : ''
-                                     }`} 
-                                 />
                                  <span className="font-semibold">EN</span>
                              </button>
                              <button
                                  onClick={() => handleLanguageChange('ru')}
-                                 className={`relative px-4 py-2 text-sm font-bold rounded-full flex items-center justify-center gap-1.5 transition-all duration-500 z-10 w-16 ${
+                                 className={`relative px-4 py-2 text-sm font-bold rounded-full flex items-center justify-center transition-all duration-500 z-10 w-16 ${
                                      language === 'ru'
                                          ? 'text-white'
                                          : `${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`
