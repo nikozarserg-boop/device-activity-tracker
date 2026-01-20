@@ -189,7 +189,11 @@ function App() {
                         </button>
 
                         {/* Language Switcher */}
-                        <div className="relative flex items-center gap-2 bg-white rounded-lg border border-gray-300 p-1 w-fit">
+                         <div className={`relative flex items-center gap-2 rounded-lg border p-1 w-fit ${
+                             theme === 'dark'
+                                 ? 'bg-gray-800 border-gray-600'
+                                 : 'bg-white border-gray-300'
+                         }`}>
                              {/* Animated Background Slider */}
                              <div 
                                  className={`absolute top-1 bottom-1 w-14 bg-blue-600 rounded transition-all duration-500 ease-in-out ${

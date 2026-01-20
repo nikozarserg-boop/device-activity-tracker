@@ -164,9 +164,13 @@ export function ContactCard({
                         <div className="flex items-center gap-2 mb-4">
                             <span className={clsx(
                                 "px-3 py-1 rounded-full text-sm font-medium",
-                                currentStatus === 'OFFLINE' ? "bg-red-100 text-red-700" :
-                                    currentStatus.includes('Online') ? "bg-green-100 text-green-700" :
-                                        currentStatus === 'Standby' ? "bg-yellow-100 text-yellow-700" : theme === 'dark' ? "bg-gray-600 text-gray-300" : "bg-gray-100 text-gray-700"
+                                currentStatus === 'OFFLINE' 
+                                    ? theme === 'dark' ? "bg-red-900/50 text-red-400" : "bg-red-100 text-red-700"
+                                    : currentStatus.includes('Online') 
+                                    ? theme === 'dark' ? "bg-green-900/50 text-green-400" : "bg-green-100 text-green-700"
+                                    : currentStatus === 'Standby' 
+                                    ? theme === 'dark' ? "bg-yellow-900/50 text-yellow-400" : "bg-yellow-100 text-yellow-700"
+                                    : theme === 'dark' ? "bg-gray-600 text-gray-300" : "bg-gray-100 text-gray-700"
                             )}>
                                 {currentStatus}
                             </span>
@@ -230,38 +234,82 @@ export function ContactCard({
                     {/* Metrics & Chart */}
                     <div className="md:col-span-2 space-y-6">
                         {/* Metrics Grid */}
-                        <div className="grid grid-cols-3 gap-4">
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                                <div className="text-sm text-gray-500 mb-1 flex items-center gap-1"><Activity size={16} /> {getTranslation(language, 'currentAvgRTT')}</div>
-                                <div className="text-2xl font-bold text-gray-900">{lastData?.avg.toFixed(0) || '-'} ms</div>
-                            </div>
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                                <div className="text-sm text-gray-500 mb-1">{getTranslation(language, 'median')}</div>
-                                <div className="text-2xl font-bold text-gray-900">{lastData?.median.toFixed(0) || '-'} ms</div>
-                            </div>
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                                <div className="text-sm text-gray-500 mb-1">{getTranslation(language, 'threshold')}</div>
-                                <div className="text-2xl font-bold text-blue-600">{lastData?.threshold.toFixed(0) || '-'} ms</div>
-                            </div>
-                        </div>
+                         <div className="grid grid-cols-3 gap-4">
+                             <div className={`p-4 rounded-xl shadow-sm border ${
+                                 theme === 'dark' 
+                                     ? 'bg-gray-700 border-gray-600' 
+                                     : 'bg-white border-gray-200'
+                             }`}>
+                                 <div className={`text-sm mb-1 flex items-center gap-1 ${
+                                     theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                 }`}><Activity size={16} /> {getTranslation(language, 'currentAvgRTT')}</div>
+                                 <div className={`text-2xl font-bold ${
+                                     theme === 'dark' ? 'text-blue-400' : 'text-gray-900'
+                                 }`}>{lastData?.avg.toFixed(0) || '-'} ms</div>
+                             </div>
+                             <div className={`p-4 rounded-xl shadow-sm border ${
+                                 theme === 'dark' 
+                                     ? 'bg-gray-700 border-gray-600' 
+                                     : 'bg-white border-gray-200'
+                             }`}>
+                                 <div className={`text-sm mb-1 ${
+                                     theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                 }`}>{getTranslation(language, 'median')}</div>
+                                 <div className={`text-2xl font-bold ${
+                                     theme === 'dark' ? 'text-blue-400' : 'text-gray-900'
+                                 }`}>{lastData?.median.toFixed(0) || '-'} ms</div>
+                             </div>
+                             <div className={`p-4 rounded-xl shadow-sm border ${
+                                 theme === 'dark' 
+                                     ? 'bg-gray-700 border-gray-600' 
+                                     : 'bg-white border-gray-200'
+                             }`}>
+                                 <div className={`text-sm mb-1 ${
+                                     theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                 }`}>{getTranslation(language, 'threshold')}</div>
+                                 <div className={`text-2xl font-bold ${
+                                     theme === 'dark' ? 'text-yellow-400' : 'text-blue-600'
+                                 }`}>{lastData?.threshold.toFixed(0) || '-'} ms</div>
+                             </div>
+                         </div>
 
                         {/* Chart */}
-                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 h-[300px]">
-                            <h5 className="text-sm font-medium text-gray-500 mb-4">{getTranslation(language, 'rttHistory')}</h5>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={data}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                                    <XAxis dataKey="timestamp" hide />
-                                    <YAxis domain={['auto', 'auto']} />
-                                    <Tooltip
-                                        labelFormatter={(t: number) => new Date(t).toLocaleTimeString()}
-                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    />
-                                    <Line type="monotone" dataKey="avg" stroke="#3b82f6" strokeWidth={2} dot={false} name={getTranslation(language, 'currentAvgRTT')} isAnimationActive={false} />
-                                    <Line type="step" dataKey="threshold" stroke="#ef4444" strokeDasharray="5 5" dot={false} name={getTranslation(language, 'threshold')} isAnimationActive={false} />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
+                         <div className={`p-6 rounded-xl shadow-sm border h-[300px] ${
+                             theme === 'dark' 
+                                 ? 'bg-gray-700 border-gray-600' 
+                                 : 'bg-white border-gray-200'
+                         }`}>
+                             <h5 className={`text-sm font-medium mb-4 ${
+                                 theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                             }`}>{getTranslation(language, 'rttHistory')}</h5>
+                             <ResponsiveContainer width="100%" height="100%">
+                                 <LineChart data={data}>
+                                     <CartesianGrid 
+                                         strokeDasharray="3 3" 
+                                         vertical={false} 
+                                         stroke={theme === 'dark' ? '#4b5563' : '#f0f0f0'} 
+                                     />
+                                     <XAxis dataKey="timestamp" hide stroke={theme === 'dark' ? '#9ca3af' : '#000'} />
+                                     <YAxis 
+                                         domain={['auto', 'auto']} 
+                                         stroke={theme === 'dark' ? '#9ca3af' : '#000'}
+                                         tick={{ fill: theme === 'dark' ? '#9ca3af' : '#000', fontSize: 12 }}
+                                     />
+                                     <Tooltip
+                                         labelFormatter={(t: number) => new Date(t).toLocaleTimeString()}
+                                         contentStyle={{ 
+                                             borderRadius: '8px', 
+                                             border: 'none', 
+                                             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                                             backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+                                             color: theme === 'dark' ? '#f3f4f6' : '#000000'
+                                         }}
+                                     />
+                                     <Line type="monotone" dataKey="avg" stroke="#3b82f6" strokeWidth={2} dot={false} name={getTranslation(language, 'currentAvgRTT')} isAnimationActive={false} />
+                                     <Line type="step" dataKey="threshold" stroke="#ef4444" strokeDasharray="5 5" dot={false} name={getTranslation(language, 'threshold')} isAnimationActive={false} />
+                                 </LineChart>
+                             </ResponsiveContainer>
+                         </div>
                     </div>
                 </div>
             </div>
